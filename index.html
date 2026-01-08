@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Điều khiển Máy ảo IDX</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #eef2f7; }
+        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; width: 350px; }
+        h2 { color: #333; margin-bottom: 20px; }
+        button { background: #4F46E5; color: white; border: none; padding: 15px 30px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s; width: 100%; }
+        button:hover { background: #4338CA; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(79, 70, 229, 0.4); }
+        button:active { transform: translateY(0); }
+        #status { margin-top: 20px; font-size: 14px; color: #666; line-height: 1.5; word-break: break-all; }
+        .loading { color: #f39c12 !important; }
+        .success { color: #27ae60 !important; }
+        .error { color: #e74c3c !important; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>IDX Control Panel</h2>
+        <button id="runBtn">🚀 Khởi chạy Máy ảo</button>
+        <p id="status">Trạng thái: Sẵn sàng</p>
+    </div>
+
+    <script>
+        // THAY TÊN MIỀN CỦA BẠN Ở ĐÂY
+        const ENDPOINT = "https://api.hostdechoi.dpdns.org/run-command";
+
+        const btn = document.getElementById('runBtn');
+        const status = document.getElementById('status');
+
+        btn.onclick = async () => {
+            btn.disabled = true;
+            status.innerText = "⏳ Đang gửi tín hiệu đến IDX...";
+            status.className = "loading";
+
+            try {
+                const response = await fetch(ENDPOINT);
+                const data = await response.text();
+                
+                if (response.ok) {
+                    status.innerText = "✅ Thành công: " + data;
+                    status.className = "success";
+                } else {
+                    throw new Error(data);
+                }
+            } catch (err) {
+                status.innerText = "❌ Lỗi: " + err.message + " (Hãy chắc chắn IDX và Tunnel đang chạy)";
+                status.className = "error";
+            } finally {
+                btn.disabled = false;
+            }
+        };
+    </script>
+</body>
+</html>
