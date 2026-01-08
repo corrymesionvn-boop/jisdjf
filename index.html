@@ -2,53 +2,46 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Điều khiển Máy ảo IDX</title>
+    <title>Bảng Điều Khiển HostDeChoi</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #eef2f7; }
-        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; width: 350px; }
-        h2 { color: #333; margin-bottom: 20px; }
-        button { background: #4F46E5; color: white; border: none; padding: 15px 30px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s; width: 100%; }
-        button:hover { background: #4338CA; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(79, 70, 229, 0.4); }
-        button:active { transform: translateY(0); }
-        #status { margin-top: 20px; font-size: 14px; color: #666; line-height: 1.5; word-break: break-all; }
-        .loading { color: #f39c12 !important; }
-        .success { color: #27ae60 !important; }
-        .error { color: #e74c3c !important; }
+        body { font-family: 'Segoe UI', sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #0f172a; color: white; }
+        .card { background: #1e293b; padding: 40px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); text-align: center; width: 380px; border: 1px solid #334155; }
+        h1 { font-size: 24px; margin-bottom: 10px; color: #38bdf8; }
+        p { color: #94a3b8; margin-bottom: 30px; }
+        button { background: #38bdf8; color: #0f172a; border: none; padding: 18px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%; }
+        button:hover { background: #7dd3fc; transform: scale(1.02); }
+        button:disabled { background: #475569; cursor: not-allowed; }
+        #status { margin-top: 25px; padding: 15px; border-radius: 8px; font-size: 14px; background: #0f172a; min-height: 20px; border: 1px dashed #334155; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2>IDX Control Panel</h2>
-        <button id="runBtn">🚀 Khởi chạy Máy ảo</button>
-        <p id="status">Trạng thái: Sẵn sàng</p>
+        <h1>HostDeChoi Panel</h1>
+        <p>Điều khiển máy ảo IDX từ xa</p>
+        <button id="runBtn">🚀 KHỞI CHẠY MÁY ẢO</button>
+        <div id="status">Trạng thái: Sẵn sàng</div>
     </div>
 
     <script>
-        // THAY TÊN MIỀN CỦA BẠN Ở ĐÂY
-        const ENDPOINT = "https://api.hostdechoi.dpdns.org/run-command";
+        // API ĐÃ FIX THEO TÊN MIỀN CỦA BẠN
+        const API_URL = "https://api.hostdechoi.dpdns.org/run-command";
 
         const btn = document.getElementById('runBtn');
         const status = document.getElementById('status');
 
         btn.onclick = async () => {
             btn.disabled = true;
-            status.innerText = "⏳ Đang gửi tín hiệu đến IDX...";
-            status.className = "loading";
+            status.innerText = "⏳ Đang kết nối tunnel & đăng nhập root...";
+            status.style.color = "#fbbf24";
 
             try {
-                const response = await fetch(ENDPOINT);
-                const data = await response.text();
-                
-                if (response.ok) {
-                    status.innerText = "✅ Thành công: " + data;
-                    status.className = "success";
-                } else {
-                    throw new Error(data);
-                }
+                const response = await fetch(API_URL);
+                const text = await response.text();
+                status.innerText = "✅ " + text;
+                status.style.color = "#4ade80";
             } catch (err) {
-                status.innerText = "❌ Lỗi: " + err.message + " (Hãy chắc chắn IDX và Tunnel đang chạy)";
-                status.className = "error";
+                status.innerText = "❌ Lỗi kết nối! Hãy kiểm tra IDX đã chạy 'cloudflared' chưa.";
+                status.style.color = "#f87171";
             } finally {
                 btn.disabled = false;
             }
