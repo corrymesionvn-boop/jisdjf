@@ -2,45 +2,47 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Bảng Điều Khiển HostDeChoi</title>
+    <title>HostDeChoi Panel</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #0f172a; color: white; }
-        .card { background: #1e293b; padding: 40px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); text-align: center; width: 380px; border: 1px solid #334155; }
-        h1 { font-size: 24px; margin-bottom: 10px; color: #38bdf8; }
-        p { color: #94a3b8; margin-bottom: 30px; }
-        button { background: #38bdf8; color: #0f172a; border: none; padding: 18px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%; }
-        button:hover { background: #7dd3fc; transform: scale(1.02); }
-        button:disabled { background: #475569; cursor: not-allowed; }
-        #status { margin-top: 25px; padding: 15px; border-radius: 8px; font-size: 14px; background: #0f172a; min-height: 20px; border: 1px dashed #334155; }
+        .card { background: #1e293b; padding: 40px; border-radius: 20px; text-align: center; width: 380px; border: 1px solid #334155; }
+        button { background: #38bdf8; color: #0f172a; border: none; padding: 18px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; width: 100%; }
+        button:disabled { background: #475569; }
+        #status { margin-top: 25px; font-size: 14px; color: #94a3b8; min-height: 40px; }
     </style>
 </head>
 <body>
     <div class="card">
         <h1>HostDeChoi Panel</h1>
-        <p>Điều khiển máy ảo IDX từ xa</p>
         <button id="runBtn">🚀 KHỞI CHẠY MÁY ẢO</button>
         <div id="status">Trạng thái: Sẵn sàng</div>
     </div>
 
     <script>
-        // API ĐÃ FIX THEO TÊN MIỀN CỦA BẠN
         const API_URL = "https://api.hostdechoi.dpdns.org/run-command";
-
         const btn = document.getElementById('runBtn');
         const status = document.getElementById('status');
 
         btn.onclick = async () => {
             btn.disabled = true;
-            status.innerText = "⏳ Đang kết nối tunnel & đăng nhập root...";
+            status.innerText = "⏳ Đang kết nối tới IDX (Vui lòng đợi)...";
             status.style.color = "#fbbf24";
 
             try {
-                const response = await fetch(API_URL);
+                const response = await fetch(API_URL, {
+                    method: 'GET',
+                    mode: 'cors', // Đảm bảo chế độ CORS được bật
+                    cache: 'no-cache'
+                });
+
+                if (!response.ok) throw new Error("Server báo lỗi: " + response.status);
+
                 const text = await response.text();
                 status.innerText = "✅ " + text;
                 status.style.color = "#4ade80";
             } catch (err) {
-                status.innerText = "❌ Lỗi kết nối! Hãy kiểm tra IDX đã chạy 'cloudflared' chưa.";
+                console.error(err);
+                status.innerText = "❌ Lỗi kết nối! Kiểm tra xem Cloudflare Tunnel đã báo 'Healthy' chưa và Server Node.js đã chạy chưa.";
                 status.style.color = "#f87171";
             } finally {
                 btn.disabled = false;
